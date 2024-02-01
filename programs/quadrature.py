@@ -45,7 +45,8 @@ def gauss_legendre_lobatto_points(num_points, tolerance):
         while True:
             s = 0
             for j in range(i-1):
-                s += 1/(r - points[j])
+                s += 1/(r - points[j]) 
+            s += 1/(r - points[-1])
             delta = -polynomials.legendre_polynomial_derivative(r, num_points-1) / (polynomials.legendre_polynomial_second_derivative(r, num_points-1) - s * polynomials.legendre_polynomial_derivative(r, num_points-1))
             r += delta
             if np.abs(delta) < eps:
@@ -75,7 +76,7 @@ def gauss_legendre_lobatto_quadrature(num_points, tolerance):
 if __name__ == "__main__":
     import matplotlib.pyplot as plt
 
-    n = 6
+    n = 9
 
     pnts_cheb = chebyshev_points(n)
     pnts_gll = gauss_legendre_lobatto_points(n, 0.00001)
