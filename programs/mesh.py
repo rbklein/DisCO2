@@ -1,3 +1,6 @@
+from jax import config
+config.update("jax_enable_x64", True)
+
 import jax.numpy as np 
 import quadrature
 
@@ -9,7 +12,7 @@ def xofsigma(sigma, a, b):
     """
     Transforms standard interval to [a,b]
     """
-    return 0.5 * (b-a) * sigma + 0.5 * (b + a)
+    return 0.5 * (b - a) * sigma + 0.5 * (b + a)
 
 def sigmaofx(x, a, b):
     """
@@ -20,7 +23,7 @@ def sigmaofx(x, a, b):
 def generate_mesh(degree, Lx, Ly, Nelx, Nely):
     """
     Generates two arrays containing mesh points for domain [0,Lx] x [0,Ly] with Nelx elements along x axis and Nely elements along y axis
-    the elements conaint n = degree + 1 Gauss Legendre Lobatto points and a dictionary containing grid indices of boundary points
+    the elements contain n = degree + 1 Gauss Legendre Lobatto points. A dictionary containing grid indices of boundary points is also generated
     """
     dx = Lx / Nelx
     dy = Ly / Nely

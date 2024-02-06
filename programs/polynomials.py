@@ -1,4 +1,6 @@
-import jax
+from jax import config
+config.update("jax_enable_x64", True)
+
 import jax.numpy as np
 
 """
@@ -81,14 +83,100 @@ def legendre_polynomial_second_derivative(x, degree):
     """
     return jacobi_polynomial_second_derivative(x, degree, 0, 0)
 
+def lagrange_polynomial(x, points, i):
+    """
+    Evaluate the unique Lagrange polynomial with value one in points[i] and zeros in points[j] with j not i at the point x
+
+    Value is computed through straightforward computation
+    """
+    if i < 0:
+        raise ValueError('error: positive index i required')
+    if len(points) < 1:
+        raise ValueError('error: at least one point is necessary')
+    if len(points) <= i:
+        raise ValueError('error: index i out of bounds for points array')
+    if len(np.unique(points)) != len(points):
+        raise ValueError('error: no duplicate values allowed')
+    if len(points) == 1:
+        return 1
+    
+    n = len(points)
+
+    num = 1
+    den = 1
+
+    j = 0
+    while j < n:
+        if j != i:
+            num *= (x - points[j])
+            den *= (points[i] - points[j])
+        j += 1
+
+    return num / den
+
+def lagrange_polynomial_derivative(x, points, i):
+    """
+    Evaluate the derivative of the unique Lagrange polynomial with value one in points[i] and zeros in points[j] with j not i at the point x
+
+    Value is computed through straightforward computation
+    """
+    if i < 0:
+        raise ValueError('error: positive index i required')
+    if len(points) < 1:
+        raise ValueError('error: at least one point is necessary')
+    if len(points) <= i:
+        raise ValueError('error: index i out of bounds for points array')
+    if len(np.unique(points)) != len(points):
+        raise ValueError('error: no duplicate values allowed')
+    if len(points) == 1:
+        return 0
+    
+    n = len(points)
+
+    num = 0
+    den = 1
+
+    j = 0
+    k = 0
+    while j < n:
+        if j != i:
+            den *= (points[i] - points[j])
+        j += 1
+
+    while k < n:
+        if i != k:
+            new = 1
+            j = 0
+            while j < n:
+                if j != i and j != k:
+                    new *= (x - points[j])
+                j += 1
+            
+            num += new
+        k += 1
+    
+    return num / den
+
+
 
 if __name__ == "__main__":
+
     import matplotlib.pyplot as plt
 
-    x = np.linspace(-1, 1, 500)
-    y = jacobi_polynomial_second_derivative(x, 2, 0, 0)
+    #x = np.linspace(-1, 1, 500)
+    #y = jacobi_polynomial_second_derivative(x, 2, 0, 0)
 
-    plt.plot(x,y)
+    import quadrature
+
+    x = np.linspace(-1, 1, 500)
+    #p = np.linspace(-1,1,5)
+    p = quadrature.gauss_legendre_lobatto_points(4, 0.0001)
+    yl = lagrange_polynomial(x, p, 2)
+    yd = lagrange_polynomial_derivative(x, p, 2)
+
+    plt.plot(x,yl)
+    plt.plot(x,yd)
+    plt.plot(p, np.zeros(len(p)), 'o')
     plt.show()
     
 
