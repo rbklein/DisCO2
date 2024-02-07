@@ -31,8 +31,6 @@ def generate_mesh(degree, Lx, Ly, Nelx, Nely):
     num_points = degree + 1
     points, _ = quadrature.gauss_legendre_lobatto_quadrature(num_points, 0.00001)
 
-    print(points)
-
     num_total_x = Nelx * num_points
     num_total_y = Nely * num_points
 
