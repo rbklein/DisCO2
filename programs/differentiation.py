@@ -48,6 +48,15 @@ How to add docstring to vmapped functions?
 differentiate_x_standard = jax.vmap(differentiate_standard_1D, (0,None,None,None), (0))
 differentiate_y_standard = jax.vmap(differentiate_standard_1D, (1,None,None,None), (1))
     
+
+def split_form_differentiate_standard_1D(flux_matrix):
+    pass
+
+"""
+TO DO:
+
+h & p convergence tests
+"""
 if __name__ == "__main__":
     import mesh
     import quadrature

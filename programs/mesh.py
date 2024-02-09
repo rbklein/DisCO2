@@ -6,6 +6,9 @@ import quadrature
 
 """
 Namespace for meshing related functions
+
+TO DO:
+- boundary padded indices
 """
 
 def xofsigma(sigma, a, b):
@@ -83,8 +86,6 @@ if __name__ == "__main__":
     X,Y,b_inds = generate_mesh(3, 1, 1, 3, 3)
 
     n = len(X[0,:])
-
-    #print(X)
 
     fig, ax = plt.subplots()
     for i in range(n):
