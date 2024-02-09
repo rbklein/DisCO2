@@ -3,6 +3,7 @@ config.update("jax_enable_x64", True)
 
 import jax.numpy as np
 import jax
+from functools import partial
 
 """
 Namespace for (numerical) flux functions
@@ -119,16 +120,51 @@ def ismail_roe_y(u1, u2, gamma):
     G1 = z3m * z4ln
     G2 = z2m / z1m * G1 
     G3 = z4m / z1m + z3m / z1m * G1
-    #F4 = 0.5 * (z2m / z1m) * ((gamma + 1) / (gamma - 1) * (z3ln / z1ln) + F2)
     G4 = 1 / (2 * z1m) * ((gamma + 1) / (gamma - 1) * G1 / z1ln + z2m * G2 + z3m * G3)
     return np.array([G1,G2,G3,G4])
 
+@partial(jax.jit, static_argnums = (2))
+def flux_matrix(u, gamma, flux_func):
+    """
+    Computes 3D flux tensor for a 1D element with vector-valued solution F[i,j,k] = f^i(u_j,u_k)
+    where u = [u_1, u_2, ..., u_num_points]
+    """
+    num_points = u.shape[1]
+    u1 = np.repeat(u[:,:,None], num_points, 2)      #j must vary over axis 1 therefore repeat over axis 2
+    u2 = np.repeat(u[:,None,:], num_points, 1)      #k        "            2              "             1
+    return flux_func(u1, u2, gamma)
 
 
 if __name__ == "__main__":
-    arr_l = np.ones((3,1024,1024))
-    arr_r = 2 * np.ones((3,1024,1024))
+    u = np.array([[1,2,3],[4,5,6],[7,8,9]])
+    flux = lambda u1, u2, gamma: u1 + 3 * u2
 
-    print(ismail_roe_x(arr_l, arr_r, 1.4).shape)
+    u1 = np.repeat(u[:,None,:], 3, 1)
+    u2 = np.repeat(u[:,:,None], 3, 2)
 
+    print(u1[0,:,:])
+    print(u2[0,:,:])
+
+    print(flux_matrix(u, 1.4, flux))
+    print(flux_matrix(u, 1.4, flux)[2,2,0])
+    
+    
+    #
+
+    #u1 = np.repeat(u[:,None,:], 3, 1)
+    #u2 = np.repeat(u[:,:,None], 3, 2)
+
+    #print(u1)
+    #print(u2)
+
+    #print(flux(u1,u2))
+
+
+    #print(np.repeat(u[None,:,:], 3, 0))
+    #print(np.repeat(u.T[:,:,None], 3, 2))
+
+    #print(u)
+    #print(u.T)
+
+    #print( flux(np.repeat(u[None,:,:], 3, 0), np.repeat(u.T[:,:,None], 3, 2))    )
 

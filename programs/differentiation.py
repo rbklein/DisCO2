@@ -49,7 +49,9 @@ differentiate_x_standard = jax.vmap(differentiate_standard_1D, (0,None,None,None
 differentiate_y_standard = jax.vmap(differentiate_standard_1D, (1,None,None,None), (1))
     
 
-def split_form_differentiate_standard_1D(flux_matrix):
+def split_form_differentiate_standard_1D(numerical_flux_function):
+    #generate array of flux_matrices with vmapped flux_matrix function taking u in R^4 as argument
+    #(D * A) * 1
     pass
 
 """

@@ -12,11 +12,13 @@ Namespace for boundary condition functions
 def periodic_1D(u, x):
     """
     Pads u periodically
+
+    x argument present for consistency
     """
     return np.hstack((u[:,-1][:,None], u, u[:,0][:,None]))
 
-periodic_y = jax.vmap(periodic_1D, (2,None), 2)
 periodic_x = jax.vmap(periodic_1D, (1,None), 1)
+periodic_y = jax.vmap(periodic_1D, (2,None), 2)
 
 if __name__ == "__main__":
     u = np.array([  
