@@ -75,6 +75,17 @@ def gauss_legendre_lobatto_quadrature(num_points, tolerance):
     weights = weights.at[1:num_points-1].set(vals)
     return points, weights
     
+def mass_array(num_points_element, tolerance, Nelx, Nely):
+    _, weights = gauss_legendre_lobatto_quadrature(num_points_element, tolerance)
+
+    weightsx = np.tile(weights, Nelx)
+    weightsy = np.tile(weights, Nely)
+
+    return weightsy[:,None] * weightsx[None,:]
+
+def boundary_mass_array(num_points_element, tolerance, Nel):
+    _, weights = gauss_legendre_lobatto_quadrature(num_points_element, tolerance)
+    return np.tile(weights, Nel)
 
 if __name__ == "__main__":
     import matplotlib.pyplot as plt

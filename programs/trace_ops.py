@@ -61,7 +61,7 @@ def trace_operator_y_standard(u, gamma, x, boundary_weights, i_1, i_2, numerical
     """
 
     u_pad = boundary_func(u, x)
-    return (boundary_weights[None,:,None]  * _trace_operator_y_standard(u_pad, gamma, i_1, i_2, numerical_flux_func, flux_func).T).T
+    return np.transpose(boundary_weights[None,:,None]  * np.transpose(_trace_operator_y_standard(u_pad, gamma, i_1, i_2, numerical_flux_func, flux_func), (0,2,1)), (0,2,1))
 
 
 if __name__ == "__main__":

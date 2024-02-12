@@ -6,6 +6,7 @@ import jax
 from functools import partial
 
 import polynomials
+import flux
 
 """
 Namespace for differentiation operators
@@ -44,22 +45,90 @@ def differentiate_standard_1D(u, D, num_values, num_nodes_element):
 
 """
 How to add docstring to vmapped functions?
+
+f.__doc__ = "some docstring"
 """
 differentiate_x_standard = jax.vmap(differentiate_standard_1D, (0,None,None,None), (0))
 differentiate_y_standard = jax.vmap(differentiate_standard_1D, (1,None,None,None), (1))
     
-
-def split_form_differentiate_standard_1D(numerical_flux_function):
-    #generate array of flux_matrices with vmapped flux_matrix function taking u in R^4 as argument
-    #(D * A) * 1
-    pass
+@jax.jit
+def split_form_differentiate_standard_1D(D, flux_matrix):
+    dF = np.sum(D[None, :, :, None] * flux_matrix, axis = 2)
+    dF = np.transpose(dF, (0,2,1))
+    dF = np.reshape(dF, (4,-1))
+    return dF
 
 """
 TO DO:
 
 h & p convergence tests
 """
-if __name__ == "__main__":
+if __name__ == "__main__": 
+
+    import flux
+    import quadrature
+
+    num_points = 4
+    Nel = 5
+    points = quadrature.gauss_legendre_lobatto_points(num_points, 0.00001)
+
+    u = np.arange(4 * Nel * num_points)
+    u = np.reshape(u, (4, Nel * num_points))
+
+    print(u)
+
+    u_r = np.reshape(u, (4, Nel, num_points))
+    u_r = np.transpose(u_r, (0,2,1))
+    print(u_r)
+
+    fluxf = lambda u1, u2, gamma:  (u1 + 2 * u2)
+
+    fmat = flux.flux_matrix_1D(u_r, 1.4, fluxf)
+
+    print(fmat)
+
+    print(fmat.shape)
+
+    D = differentiation_matrix_1D(points)
+
+    print(D)
+
+    dF = split_form_differentiate_standard_1D(D, fmat)
+    
+    print(dF)
+
+    '''
+    import mesh
+    import quadrature
+
+    degree = 3
+    points = quadrature.gauss_legendre_lobatto_points(degree + 1, 0.00001)
+
+    Nelx = 256
+    Lx = 1
+
+    X,Y, ind = mesh.generate_mesh(degree, Lx, Lx, Nelx, 5)
+    dx = Lx / Nelx
+    x = X[0,:]
+
+    gamma = 1.4
+    initial_rho = lambda x: 2 + 0.5 * np.exp(-100 * (x - 0.5)**2)
+    initial_u = lambda x: 1/10 * np.exp(-100 * (x - 0.5)**2)
+    initial_v = lambda x: 0 * x     
+    initial_p = lambda x: initial_rho(x)**gamma
+
+    rho0 = initial_rho(x)
+    u0 = initial_u(x)
+    v0 = initial_v(x)
+    p0 = initial_p(x)
+
+    u = np.vstack((rho0[None,:], (rho0 * u0)[None,:], (rho0 * v0)[None,:], (p0 / (gamma - 1) + 0.5 * rho0 * u0**2)[None,:]))
+
+    print(u.shape)
+    '''
+
+
+    '''
     import mesh
     import quadrature
     import matplotlib.pyplot as plt
@@ -103,7 +172,7 @@ if __name__ == "__main__":
     ax.plot_surface(X,Y,dudy)
 
     plt.show()
-
+    '''
 
 
     '''

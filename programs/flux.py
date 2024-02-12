@@ -134,6 +134,7 @@ def flux_matrix(u, gamma, flux_func):
     u2 = np.repeat(u[:,None,:], num_points, 1)      #k        "            2              "             1
     return flux_func(u1, u2, gamma)
 
+flux_matrix_1D = jax.vmap(flux_matrix, (2, None, None), 3)
 
 if __name__ == "__main__":
     u = np.array([[1,2,3],[4,5,6],[7,8,9]])
