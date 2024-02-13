@@ -53,7 +53,7 @@ differentiate_y_standard = jax.vmap(differentiate_standard_1D, (1,None,None,None
     
 @jax.jit
 def split_form_differentiate_standard_1D(D, flux_matrix):
-    dF = np.sum(D[None, :, :, None] * flux_matrix, axis = 2)
+    dF = 2 * np.sum(D[None, :, :, None] * flux_matrix, axis = 2)
     dF = np.transpose(dF, (0,2,1))
     dF = np.reshape(dF, (4,-1))
     return dF

@@ -137,35 +137,26 @@ def flux_matrix(u, gamma, flux_func):
 flux_matrix_1D = jax.vmap(flux_matrix, (2, None, None), 3)
 
 if __name__ == "__main__":
-    u = np.array([[1,2,3],[4,5,6],[7,8,9]])
-    flux = lambda u1, u2, gamma: u1 + 3 * u2
-
-    u1 = np.repeat(u[:,None,:], 3, 1)
-    u2 = np.repeat(u[:,:,None], 3, 2)
-
-    print(u1[0,:,:])
-    print(u2[0,:,:])
-
-    print(flux_matrix(u, 1.4, flux))
-    print(flux_matrix(u, 1.4, flux)[2,2,0])
+    num_el = 5
+    num_points = 4
     
+    u = np.arange(4 * num_el * num_points)
+    u = np.reshape(u, (4, num_el * num_points))
+    print(u)
+
+    u_r = np.reshape(u, (4, -1, num_points))
+    u_r = np.transpose(u_r, (0,2,1))
+
+    print(u_r)
+
+    def num_flux(u1, u2, gamma):
+        f1 = u1[0] + 2 * u2[0]
+        f2 = 0.5 * u1[1] + u2[1]
+        f3 = u1[2] + 0.25 * u2[2]
+        f4 = 0.1 * u1[3] + 0.2 * u2[3]
+        return np.array([f1,f2,f3,f4])
     
-    #
+    F = flux_matrix_1D(u_r, 1.4, num_flux)
 
-    #u1 = np.repeat(u[:,None,:], 3, 1)
-    #u2 = np.repeat(u[:,:,None], 3, 2)
-
-    #print(u1)
-    #print(u2)
-
-    #print(flux(u1,u2))
-
-
-    #print(np.repeat(u[None,:,:], 3, 0))
-    #print(np.repeat(u.T[:,:,None], 3, 2))
-
-    #print(u)
-    #print(u.T)
-
-    #print( flux(np.repeat(u[None,:,:], 3, 0), np.repeat(u.T[:,:,None], 3, 2))    )
+    print(F)
 

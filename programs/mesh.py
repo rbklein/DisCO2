@@ -6,9 +6,6 @@ import quadrature
 
 """
 Namespace for meshing related functions
-
-TO DO:
-- boundary padded indices
 """
 
 def xofsigma(sigma, a, b):
@@ -78,7 +75,20 @@ def generate_mesh(degree, Lx, Ly, Nelx, Nely):
 
     boundary_inds = {'i_U' : boundary_inds_i_U, 'j_U' : boundary_inds_j_U, 'i_D' : boundary_inds_i_D, 'j_D' : boundary_inds_j_D, 'i_L' : boundary_inds_i_L, 'j_L' : boundary_inds_j_L, 'i_R' : boundary_inds_i_R, 'j_R' : boundary_inds_j_R}
 
-    return X, Y, boundary_inds
+    trace_x_i = np.zeros((boundary_inds_i_R.shape[0], boundary_inds_i_L.shape[1] + boundary_inds_i_R.shape[1]), dtype = int)
+    trace_x_j = np.zeros((boundary_inds_j_R.shape[0], boundary_inds_j_L.shape[1] + boundary_inds_j_R.shape[1]), dtype = int)
+    trace_y_i = np.zeros((boundary_inds_i_D.shape[0] + boundary_inds_i_U.shape[0], boundary_inds_i_U.shape[1]), dtype = int)
+    trace_y_j = np.zeros((boundary_inds_j_D.shape[0] + boundary_inds_j_U.shape[0], boundary_inds_j_U.shape[1]), dtype = int)
+    trace_x_i = trace_x_i.at[:,::2].set(boundary_inds_i_L) 
+    trace_x_i = trace_x_i.at[:,1::2].set(boundary_inds_i_R)
+    trace_x_j = trace_x_j.at[:,::2].set(boundary_inds_j_L) 
+    trace_x_j = trace_x_j.at[:,1::2].set(boundary_inds_j_R)
+    trace_y_i = trace_y_i.at[::2,:].set(boundary_inds_i_D)
+    trace_y_i = trace_y_i.at[1::2,:].set(boundary_inds_i_U)
+    trace_y_j = trace_y_j.at[::2,:].set(boundary_inds_j_D)
+    trace_y_j = trace_y_j.at[1::2,:].set(boundary_inds_j_U)
+
+    return X, Y, boundary_inds, trace_x_i, trace_x_j, trace_y_i, trace_y_j
 
 if __name__ == "__main__":
     import matplotlib.pyplot as plt
