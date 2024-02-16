@@ -56,8 +56,8 @@ def generate_mesh(degree, Lx, Ly, Nelx, Nely):
 
     for i in range(Nely):
         meshy = meshy.at[i * num_points:(i + 1) * num_points].set(xofsigma(points, i * dy, (i + 1) * dy))
-        boundary_inds_i_U = boundary_inds_i_U.at[i].set(i * num_points)
-        boundary_inds_i_D = boundary_inds_i_D.at[i].set((i + 1) * num_points - 1)
+        boundary_inds_i_D = boundary_inds_i_D.at[i].set(i * num_points)
+        boundary_inds_i_U = boundary_inds_i_U.at[i].set((i + 1) * num_points - 1)
 
 
     X = np.ones(num_total_y)[:,None] * meshx[None,:]

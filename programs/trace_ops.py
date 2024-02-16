@@ -34,7 +34,7 @@ def trace_operator_standard_1D(u, gamma, i_1, i_2, numerical_flux_func, flux_fun
     dF1 = -(f_1 - F)
     dF2 = f_2 - F
 
-    Fs = functional.interleave_vector(dF2, dF1) #np.reshape(np.vstack((dF1,dF2)), (-1,), order = 'F')
+    Fs = functional.interleave_vector(dF2,dF1) #np.reshape(np.vstack((dF1,dF2)), (-1,), order = 'F')
     return Fs[:,1:-1]
 
 _trace_operator_x_standard = jax.vmap(trace_operator_standard_1D, (1, None, None, None, None, None), 1)
@@ -76,7 +76,7 @@ def trace_operator_y_standard(u, gamma, x, boundary_weights, i_1, i_2, numerical
     """
 
     u_pad = boundary_func(u, x)
-    return np.transpose(boundary_weights[None,:,None] * np.transpose(_trace_operator_y_standard(u_pad, gamma, i_1, i_2, numerical_flux_func, flux_func), (0,2,1)), (0,2,1))
+    return boundary_weights[None,None,:] * _trace_operator_y_standard(u_pad, gamma, i_1, i_2, numerical_flux_func, flux_func)
 
 @partial(jax.jit, static_argnums = (7,8,9))
 def trace_operator_y(u, dx, gamma, x, boundary_weights, i_1, i_2, numerical_flux_func, flux_func, boundary_func):
@@ -92,6 +92,18 @@ def trace_operator_y(u, dx, gamma, x, boundary_weights, i_1, i_2, numerical_flux
 
 
 if __name__ == "__main__":
+
+    '''
+    arr = np.arange(3*3*3)
+    arr = np.reshape(arr, (3,3,3))
+
+    print(arr)
+
+    vals = np.array([1,2,3])
+
+    print(vals[None,None,:] * arr)
+
+    '''
     import boundary
 
     num_el = 5
@@ -123,11 +135,28 @@ if __name__ == "__main__":
     
     print(dF)
 
-    print(i_1_pad)
-    print(i_2_pad)
+    #print(i_1_pad)
+    #print(i_2_pad)
 
-    print(u_pad[:,i_1_pad])
-    print(u_pad[:,i_2_pad])
+    #print(u_pad[:,i_1_pad])
+    #print(u_pad[:,i_2_pad])
 
+    u2 = u_pad[:,None,:]
+    u2 = np.concatenate((u2,u2), 1)
+
+    print(u2)
+
+    dF2 = _trace_operator_x_standard(u2, 1.4, i_1, i_2, num_flux, cont_flux)
     
+    print(dF2)
 
+    u3 = u[:,:,None]
+    u3 = np.concatenate((u3,u3), 2)
+
+    x = np.array([1,2])
+    boundary_weights = np.array([1,2])
+
+    dF3 = trace_operator_y_standard(u3, 1.4, x, boundary_weights, i_1, i_2, num_flux, cont_flux, boundary.periodic_y)
+    
+    print(dF3)
+    

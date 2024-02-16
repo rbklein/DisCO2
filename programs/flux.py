@@ -35,7 +35,7 @@ def continuous_flux_y(u, gamma):
     f1 = u[2]
     f2 = u[1] * u[2] / u[0]   
     f3 = u[2]**2 / u[0] + p
-    f4 = (u[3] + p) * u[1] / u[0]
+    f4 = (u[3] + p) * u[2] / u[0]
 
     return np.array([f1,f2,f3,f4])
 

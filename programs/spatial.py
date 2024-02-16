@@ -19,9 +19,10 @@ def dudt(u, gamma, x, y, dx, dy, total_x, total_y, weight_array, weight_x, weigh
 
     trace_x = trace_ops.trace_operator_x(u, dy, gamma, y, weight_x, trace_inds["j_L"][0,:], trace_inds["j_R"][0,:], numerical_trace_flux_x, continuous_flux_x, boundary_x)
     trace_y = trace_ops.trace_operator_y(u, dx, gamma, x, weight_y, trace_inds["i_D"][:,0], trace_inds["i_U"][:,0], numerical_trace_flux_y, continuous_flux_y, boundary_y)
-
-    dudt = dudt.at[:,trace_x_i,trace_x_j].add(trace_x)
-    dudt = dudt.at[:,trace_y_i,trace_y_j].add(trace_y)
+    #dudt = dudt.at[:,trace_x_i,trace_x_j].add(trace_x)
+    dudt = dudt.at[:,:,trace_x_j[0,:]].add(trace_x)
+    dudt = dudt.at[:,trace_y_i[:,0],:].add(trace_y)
+    #dudt = dudt.at[:,trace_y_i[:,0],trace_y_j].add(trace_y)
 
     dudt = dudt / (weight_array[None,:,:] * dx * dy * 0.25)
     return dudt
